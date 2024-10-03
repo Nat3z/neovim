@@ -7,4 +7,5 @@ return {
   require 'plugins/toggleterm',
   require 'plugins/copilot',
   require 'plugins/harpoon',
+  require 'plugins/comment',
 }
