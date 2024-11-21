@@ -5,7 +5,7 @@ return { -- Autocompletion
     -- Snippet Engine & its associated nvim-cmp source
     {
       'L3MON4D3/LuaSnip',
-      build = (function()
+      build = require('nixCatsUtils').lazyAdd((function()
         -- Build Step is needed for regex support in snippets.
         -- This step is not supported in many windows environments.
         -- Remove the below condition to re-enable on windows.
@@ -13,7 +13,7 @@ return { -- Autocompletion
           return
         end
         return 'make install_jsregexp'
-      end)(),
+      end)()),
       dependencies = {
         -- `friendly-snippets` contains a variety of premade snippets.
         --    See the README about individual language/framework/plugin snippets:
