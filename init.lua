@@ -5,7 +5,6 @@ require('nixCatsUtils').setup {
   non_nix_value = true,
 }
 
-
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -111,11 +110,11 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
+-- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+--
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -131,10 +130,10 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 local function getlockfilepath()
-  if require('nixCatsUtils').isNixCats and type(require('nixCats').settings.unwrappedCfgPath) == "string" then
-    return require('nixCats').settings.unwrappedCfgPath .. "/lazy-lock.json"
+  if require('nixCatsUtils').isNixCats and type(require('nixCats').settings.unwrappedCfgPath) == 'string' then
+    return require('nixCats').settings.unwrappedCfgPath .. '/lazy-lock.json'
   else
-    return vim.fn.stdpath("config") .. "/lazy-lock.json"
+    return vim.fn.stdpath 'config' .. '/lazy-lock.json'
   end
 end
 
@@ -185,8 +184,7 @@ local lazyOptions = {
   },
 }
 
-require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "lazy.nvim" }),
-{
+require('nixCatsUtils.lazyCat').setup(nixCats.pawsible { 'allPlugins', 'start', 'lazy.nvim' }, {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   require 'plugins',
@@ -311,8 +309,8 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
-      { 
-        'williamboman/mason.nvim', 
+      {
+        'williamboman/mason.nvim',
         config = true,
         enabled = require('nixCatsUtils').lazyAdd(true, false),
       }, -- NOTE: Must be loaded before dependants
@@ -336,13 +334,15 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
-      { 'folke/lazydev.nvim', ft = "lua",
+      {
+        'folke/lazydev.nvim',
+        ft = 'lua',
         opts = {
           library = {
             -- adds type hints for nixCats global
-            { path = (require('nixCats').nixCatsPath or "") .. '/lua', words = { "nixCats" } },
+            { path = (require('nixCats').nixCatsPath or '') .. '/lua', words = { 'nixCats' } },
           },
-        }
+        },
       },
 
       -- Allows extra capabilities provided by nvim-cmp
@@ -533,14 +533,14 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
       --
       --  You can press `g?` for help in this menu.
       if require('nixCatsUtils').isNixCats then
-        for server_name,_ in pairs(servers) do
-          require('lspconfig')[server_name].setup({
+        for server_name, _ in pairs(servers) do
+          require('lspconfig')[server_name].setup {
             capabilities = capabilities,
             settings = servers[server_name],
             filetypes = (servers[server_name] or {}).filetypes,
             cmd = (servers[server_name] or {}).cmd,
             root_pattern = (servers[server_name] or {}).root_pattern,
-          })
+          }
         end
       else
         require('mason').setup()
@@ -613,13 +613,13 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
   },
 
   -- Highlight todo, notes, etc in comments
-  { 
-    'folke/todo-comments.nvim', 
-    event = 'VimEnter', 
-    dependencies = { 
-      'nvim-lua/plenary.nvim'
-    }, 
-    opts = { signs = false }
+  {
+    'folke/todo-comments.nvim',
+    event = 'VimEnter',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+    },
+    opts = { signs = false },
   },
 
   { -- Collection of various small independent plugins/modules
@@ -666,7 +666,7 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible({"allPlugins", "start", "
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
       -- Autoinstall languages that are not installed
-      ensure_installed = require('nixCatsUtils').lazyAdd({ 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' }),
+      ensure_installed = require('nixCatsUtils').lazyAdd { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
       auto_install = require('nixCatsUtils').lazyAdd(true, false),
       highlight = {
         enable = true,
