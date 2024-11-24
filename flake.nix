@@ -107,8 +107,9 @@
           stylua
           rust-analyzer
           vscode-langservers-extracted
-          typescript
           nodePackages."@astrojs/language-server"
+          nodePackages.typescript-language-server
+          tailwindcss-language-server
           nodePackages.svelte-language-server
         ];
         kickstart-debug = [
