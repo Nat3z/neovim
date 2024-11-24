@@ -105,6 +105,11 @@
           lua-language-server
           nixd
           stylua
+          rust-analyzer
+          vscode-langservers-extracted
+          typescript
+          nodePackages."@astrojs/language-server"
+          nodePackages.svelte-language-server
         ];
         kickstart-debug = [
           delve

@@ -90,11 +90,10 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-
-vim.keymap.set('n', '<leader>h', '<cmd>lua os.execute "tmux select-pane -L"<cr>', { silent = false })
-vim.keymap.set('n', '<leader>j', '<cmd>lua os.execute "tmux select-pane -D"<cr>', { silent = false })
-vim.keymap.set('n', '<leader>k', '<cmd>lua os.execute "tmux select-pane -U"<cr>', { silent = false })
-vim.keymap.set('n', '<leader>l', '<cmd>lua os.execute "tmux select-pane -R"<cr>', { silent = false })
+vim.keymap.set('n', '<C-h>', '<cmd>lua os.execute "tmux select-pane -L"<cr>', { silent = false })
+vim.keymap.set('n', '<C-j>', '<cmd>lua os.execute "tmux select-pane -D"<cr>', { silent = false })
+vim.keymap.set('n', '<C-k>', '<cmd>lua os.execute "tmux select-pane -U"<cr>', { silent = false })
+vim.keymap.set('n', '<C-l>', '<cmd>lua os.execute "tmux select-pane -R"<cr>', { silent = false })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -493,7 +492,7 @@ require('nixCatsUtils.lazyCat').setup(nixCats.pawsible { 'allPlugins', 'start', 
         -- clangd = {},
         -- gopls = {},
         -- pyright = {},
-        -- rust_analyzer = {},
+        rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
