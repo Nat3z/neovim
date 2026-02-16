@@ -6,3 +6,4 @@ nvim
 spell/
 lazy-lock.json
 tmp/
+DS_Store
