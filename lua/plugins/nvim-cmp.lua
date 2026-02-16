@@ -114,8 +114,11 @@ return { -- Autocompletion
           end
         end,
         ['<Tab>'] = cmp.mapping(function(fallback)
-          -- This little snippet will confirm with tab, and if no entry is selected, will confirm the first item
-          if cmp.visible() then
+          local copilot_ok, copilot_keys = pcall(vim.fn['copilot#Accept'], '')
+          if copilot_ok and copilot_keys ~= '' then
+            vim.api.nvim_feedkeys(copilot_keys, 'n', false)
+          elseif cmp.visible() then
+            -- Confirm with tab, and if no entry is selected, confirm the first item
             local entry = cmp.get_selected_entry()
             if not entry then
               cmp.select_next_item { behavior = cmp.SelectBehavior.Select }

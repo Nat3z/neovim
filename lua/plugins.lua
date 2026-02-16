@@ -9,4 +9,5 @@ return {
   require 'plugins/harpoon',
   require 'plugins/comment',
   require 'plugins/tmux-navigator',
+  require 'plugins/99',
 }
