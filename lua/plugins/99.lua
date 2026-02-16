@@ -8,7 +8,8 @@ return {
     local cwd = vim.uv.cwd()
     local basename = vim.fs.basename(cwd)
     _99.setup {
-      provider = _99.CursorAgentProvider,
+      provider = _99.OpenCodeProvider,
+      model = 'openai/gpt-5.3-codex',
       logger = {
         level = _99.DEBUG,
         path = '/tmp/' .. basename .. '.99.debug',
@@ -38,11 +39,11 @@ return {
     -- so just prepare for it now
     vim.keymap.set('v', '<leader>k', function()
       _99.visual()
-    end)
+    end, { desc = '99: Send visual selection to AI' })
 
     --- if you have a request you dont want to make any changes, just cancel it
-    vim.keymap.set('v', '<leader>K', function()
+    vim.keymap.set('n', '<leader>K', function()
       _99.stop_all_requests()
-    end)
+    end, { desc = '99: Stop all AI requests' })
   end,
 }

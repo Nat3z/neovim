@@ -113,23 +113,6 @@ return { -- Autocompletion
             }
           end
         end,
-        ['<Tab>'] = cmp.mapping(function(fallback)
-          local copilot_ok, copilot_keys = pcall(vim.fn['copilot#Accept'], '')
-          if copilot_ok and copilot_keys ~= '' then
-            vim.api.nvim_feedkeys(copilot_keys, 'n', false)
-          elseif cmp.visible() then
-            -- Confirm with tab, and if no entry is selected, confirm the first item
-            local entry = cmp.get_selected_entry()
-            if not entry then
-              cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
-            else
-              cmp.confirm()
-            end
-          else
-            fallback()
-          end
-        end, { 'i', 's', 'c' }),
-
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
       },
@@ -144,5 +127,24 @@ return { -- Autocompletion
         { name = 'path' },
       },
     }
+
+    vim.keymap.set({ 'i', 's' }, '<Tab>', function()
+      local copilot_ok, copilot_keys = pcall(vim.fn['copilot#Accept'], '')
+      if copilot_ok and copilot_keys ~= '' then
+        return copilot_keys
+      end
+
+      if cmp.visible() then
+        local entry = cmp.get_selected_entry()
+        if not entry then
+          cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
+        else
+          cmp.confirm()
+        end
+        return ''
+      end
+
+      return '\t'
+    end, { expr = true, silent = true, replace_keycodes = false })
   end,
 }
