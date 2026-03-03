@@ -128,19 +128,78 @@ return { -- Autocompletion
       },
     }
 
+    local function has_multiline_cursortab_change_off_cursor()
+      local daemon_ok, daemon = pcall(require, 'cursortab.daemon')
+      if not daemon_ok then
+        return false
+      end
+
+      local marks = vim.api.nvim_buf_get_extmarks(
+        vim.api.nvim_get_current_buf(),
+        daemon.get_namespace_id(),
+        0,
+        -1,
+        { details = true }
+      )
+
+      if #marks == 0 then
+        return false
+      end
+
+      local min_line = nil
+      local max_line = nil
+
+      for _, mark in ipairs(marks) do
+        local row = mark[2]
+        local details = mark[4] or {}
+
+        if not min_line or row < min_line then
+          min_line = row
+        end
+        if not max_line or row > max_line then
+          max_line = row
+        end
+
+        if details.end_row and details.end_row > (max_line or details.end_row) then
+          max_line = details.end_row
+        end
+
+        if details.virt_lines and #details.virt_lines > 0 then
+          local virt_end = row + #details.virt_lines
+          if virt_end > (max_line or virt_end) then
+            max_line = virt_end
+          end
+        end
+      end
+
+      if not min_line or not max_line or min_line == max_line then
+        return false
+      end
+
+      local cursor_line = vim.api.nvim_win_get_cursor(0)[1] - 1
+      return min_line ~= cursor_line
+    end
+
     vim.keymap.set({ 'i', 's' }, '<Tab>', function()
-      local copilot_ok, copilot_keys = pcall(vim.fn['copilot#Accept'], '')
-      if copilot_ok and copilot_keys ~= '' then
-        return copilot_keys
+      local cursortab_ok, cursortab = pcall(require, 'cursortab')
+      if cursortab_ok and cursortab.accept() then
+        return ''
+      end
+
+      if cursortab_ok and has_multiline_cursortab_change_off_cursor() then
+        local daemon_ok, daemon = pcall(require, 'cursortab.daemon')
+        if daemon_ok then
+          daemon.send_event 'accept'
+          return ''
+        end
       end
 
       if cmp.visible() then
         local entry = cmp.get_selected_entry()
-        if not entry then
-          cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
-        else
-          cmp.confirm()
-        end
+        cmp.confirm {
+          behavior = cmp.ConfirmBehavior.Replace,
+          select = entry == nil,
+        }
         return ''
       end
 

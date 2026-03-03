@@ -10,4 +10,6 @@ return {
   require 'plugins/comment',
   require 'plugins/tmux-navigator',
   require 'plugins/99',
+  require 'plugins/cursortab',
+  require 'plugins/oil-git',
 }
