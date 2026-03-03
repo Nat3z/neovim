@@ -3,15 +3,22 @@ return {
   lazy = false,
   ---@module 'oil'
   ---@type oil.SetupOpts
-  opts = {
-    view_options = {
-      show_hidden = true,
-    },
+  dependencies = {
+    { 'echasnovski/mini.icons', opts = {} },
+    { 'refractalize/oil-git-status.nvim' }, -- no opts/config here
   },
-  -- Optional dependencies
-  dependencies = { { 'echasnovski/mini.icons', opts = {} } },
-  -- dependencies = { 'nvim-tree/nvim-web-devicons' }, -- use if prefer nvim-web-devicons
   init = function()
     vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+  end,
+  config = function(_)
+    require('oil').setup {
+      view_options = {
+        show_hidden = true,
+      },
+      win_options = {
+        signcolumn = 'yes:2',
+      },
+    }
+    require('oil-git-status').setup {}
   end,
 }
