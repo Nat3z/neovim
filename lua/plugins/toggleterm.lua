@@ -84,7 +84,7 @@ function open_pi_yeet()
     'split-window',
     '-h',
     '-p',
-    '40',
+    '25',
     '-c',
     cwd,
     '-P',
