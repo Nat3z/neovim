@@ -182,24 +182,29 @@ return { -- Autocompletion
 
     vim.keymap.set({ 'i', 's' }, '<Tab>', function()
       local cursortab_ok, cursortab = pcall(require, 'cursortab')
-      if cursortab_ok and cursortab.accept() then
-        return ''
+      if cursortab_ok then
+        local accept_ok, accepted = pcall(cursortab.accept)
+        if accept_ok and accepted then
+          return ''
+        end
       end
 
       if cursortab_ok and has_multiline_cursortab_change_off_cursor() then
         local daemon_ok, daemon = pcall(require, 'cursortab.daemon')
         if daemon_ok then
-          daemon.send_event 'accept'
+          local _ = pcall(daemon.send_event, 'accept')
           return ''
         end
       end
 
       if cmp.visible() then
         local entry = cmp.get_selected_entry()
-        cmp.confirm {
-          behavior = cmp.ConfirmBehavior.Replace,
-          select = entry == nil,
-        }
+        vim.schedule(function()
+          cmp.confirm {
+            behavior = cmp.ConfirmBehavior.Replace,
+            select = entry == nil,
+          }
+        end)
         return ''
       end
 

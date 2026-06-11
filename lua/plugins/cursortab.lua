@@ -1,6 +1,6 @@
 return {
   {
-    'leonardcser/cursortab.nvim',
+    'cursortab/cursortab.nvim',
     lazy = false,
     build = 'cd server && go build',
     config = function()
@@ -67,8 +67,8 @@ return {
           immediate_shutdown = false, -- Shutdown daemon immediately when no clients
         },
         provider = {
-          type = 'sweepapi',
-          api_key_env = 'SWEEPAPI_TOKEN',
+          type = 'mercuryapi',
+          api_key_env = 'MERCURY_AI_TOKEN',
         },
       }
       vim.keymap.set('n', '<Tab>', require('cursortab').accept)
