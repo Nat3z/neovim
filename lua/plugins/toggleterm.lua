@@ -8,7 +8,7 @@ function create_term(num)
   term:toggle()
 end
 
-local function watch_pi_waiting(pane_id, saw_waiting, checks)
+local function watch_pi_working(pane_id, saw_working, checks)
   checks = checks or 0
 
   local lines = vim.fn.systemlist({ 'tmux', 'capture-pane', '-t', pane_id, '-p' })
@@ -17,21 +17,21 @@ local function watch_pi_waiting(pane_id, saw_waiting, checks)
   end
 
   local output = table.concat(lines, '\n'):lower()
-  local has_waiting = output:find('waiting', 1, true) ~= nil
+  local has_working = output:find('working...', 1, true) ~= nil
 
-  if saw_waiting and not has_waiting then
-    vim.notify('Pi is no longer waiting; closing tmux pane ' .. pane_id, vim.log.levels.INFO)
+  if saw_working and not has_working then
+    vim.notify('Pi is no longer working; closing tmux pane ' .. pane_id, vim.log.levels.INFO)
     vim.fn.system({ 'tmux', 'kill-pane', '-t', pane_id })
     return
   end
 
   if checks >= 2000 then
-    vim.notify('Stopped watching pi pane for waiting timeout', vim.log.levels.WARN)
+    vim.notify('Stopped watching pi pane for Working... timeout', vim.log.levels.WARN)
     return
   end
 
   vim.defer_fn(function()
-    watch_pi_waiting(pane_id, saw_waiting or has_waiting, checks + 1)
+    watch_pi_working(pane_id, saw_working or has_working, checks + 1)
   end, 600)
 end
 
@@ -54,6 +54,8 @@ function open_pi_yeet()
     '-F',
     '#{pane_id}',
     'pi',
+    '--model',
+    'cursor/auto',
   })[1]
 
   if vim.v.shell_error ~= 0 or not pane_id or pane_id == '' then
@@ -63,11 +65,11 @@ function open_pi_yeet()
 
   vim.notify('Opened pi in tmux pane ' .. pane_id .. '; sending /yeet', vim.log.levels.INFO)
   vim.defer_fn(function()
-    vim.fn.system({ 'tmux', 'send-keys', '-t', pane_id, '/yeet' })
+    vim.fn.system({ 'tmux', 'send-keys', '-t', pane_id, '-l', '/yeet' })
     vim.defer_fn(function()
-      vim.fn.system({ 'tmux', 'send-keys', '-t', pane_id, 'C-m' })
+      vim.fn.system({ 'tmux', 'send-keys', '-t', pane_id, 'Enter' })
       vim.defer_fn(function()
-        watch_pi_waiting(pane_id)
+        watch_pi_working(pane_id)
       end, 600)
     end, 600)
   end, 1000)
