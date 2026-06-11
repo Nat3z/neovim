@@ -82,6 +82,7 @@ function open_pi_yeet()
   local pane_id = vim.fn.systemlist({
     'tmux',
     'split-window',
+    '-d',
     '-h',
     '-p',
     '25',
