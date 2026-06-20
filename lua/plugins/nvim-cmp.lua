@@ -40,6 +40,11 @@ return { -- Autocompletion
     local luasnip = require 'luasnip'
     luasnip.config.setup {}
 
+    local cmp_menu_was_navigated = false
+    local function reset_cmp_menu_navigation()
+      cmp_menu_was_navigated = false
+    end
+
     cmp.setup {
       snippet = {
         expand = function(args)
@@ -53,6 +58,11 @@ return { -- Autocompletion
       --
       -- No, but seriously. Please read `:help ins-completion`, it is really good!
       mapping = cmp.mapping.preset.insert {
+        -- We handle arrows ourselves below so we can remember when the menu
+        -- was intentionally navigated. That is the only time <Tab> accepts cmp.
+        ['<Down>'] = cmp.config.disable,
+        ['<Up>'] = cmp.config.disable,
+
         -- Select the [n]ext item
         ['<C-n>'] = cmp.mapping.select_next_item(),
         -- Select the [p]revious item
@@ -128,87 +138,74 @@ return { -- Autocompletion
       },
     }
 
-    local function has_multiline_cursortab_change_off_cursor()
-      local daemon_ok, daemon = pcall(require, 'cursortab.daemon')
-      if not daemon_ok then
+    cmp.event:on('menu_opened', reset_cmp_menu_navigation)
+    cmp.event:on('menu_closed', reset_cmp_menu_navigation)
+    cmp.event:on('confirm_done', reset_cmp_menu_navigation)
+
+    vim.keymap.set({ 'i', 's' }, '<Down>', function()
+      if cmp.visible() then
+        cmp_menu_was_navigated = true
+        cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
+        return ''
+      end
+      return '<Down>'
+    end, { expr = true, silent = true, replace_keycodes = true, desc = 'Select next cmp item' })
+
+    vim.keymap.set({ 'i', 's' }, '<Up>', function()
+      if cmp.visible() then
+        cmp_menu_was_navigated = true
+        cmp.select_prev_item { behavior = cmp.SelectBehavior.Select }
+        return ''
+      end
+      return '<Up>'
+    end, { expr = true, silent = true, replace_keycodes = true, desc = 'Select previous cmp item' })
+
+    vim.api.nvim_create_autocmd('TextChangedI', {
+      group = vim.api.nvim_create_augroup('cmp-tab-menu-navigation', { clear = true }),
+      callback = reset_cmp_menu_navigation,
+    })
+
+    local function accept_cursortab()
+      local cursortab_ok, cursortab = pcall(require, 'cursortab')
+      if not cursortab_ok then
         return false
       end
 
-      local marks = vim.api.nvim_buf_get_extmarks(
-        vim.api.nvim_get_current_buf(),
-        daemon.get_namespace_id(),
-        0,
-        -1,
-        { details = true }
-      )
-
-      if #marks == 0 then
-        return false
-      end
-
-      local min_line = nil
-      local max_line = nil
-
-      for _, mark in ipairs(marks) do
-        local row = mark[2]
-        local details = mark[4] or {}
-
-        if not min_line or row < min_line then
-          min_line = row
-        end
-        if not max_line or row > max_line then
-          max_line = row
-        end
-
-        if details.end_row and details.end_row > (max_line or details.end_row) then
-          max_line = details.end_row
-        end
-
-        if details.virt_lines and #details.virt_lines > 0 then
-          local virt_end = row + #details.virt_lines
-          if virt_end > (max_line or virt_end) then
-            max_line = virt_end
-          end
-        end
-      end
-
-      if not min_line or not max_line or min_line == max_line then
-        return false
-      end
-
-      local cursor_line = vim.api.nvim_win_get_cursor(0)[1] - 1
-      return min_line ~= cursor_line
+      local accept_ok, accepted = pcall(cursortab.accept)
+      return accept_ok and accepted
     end
 
     vim.keymap.set({ 'i', 's' }, '<Tab>', function()
-      local cursortab_ok, cursortab = pcall(require, 'cursortab')
-      if cursortab_ok then
-        local accept_ok, accepted = pcall(cursortab.accept)
-        if accept_ok and accepted then
-          return ''
-        end
-      end
-
-      if cursortab_ok and has_multiline_cursortab_change_off_cursor() then
-        local daemon_ok, daemon = pcall(require, 'cursortab.daemon')
-        if daemon_ok then
-          local _ = pcall(daemon.send_event, 'accept')
-          return ''
-        end
-      end
-
-      if cmp.visible() then
+      if cmp.visible() and cmp_menu_was_navigated then
         local entry = cmp.get_selected_entry()
-        vim.schedule(function()
-          cmp.confirm {
-            behavior = cmp.ConfirmBehavior.Replace,
-            select = entry == nil,
-          }
-        end)
+        if entry and entry.source.name ~= 'nvim_lsp_signature_help' then
+          reset_cmp_menu_navigation()
+          vim.schedule(function()
+            cmp.confirm {
+              behavior = cmp.ConfirmBehavior.Replace,
+              select = false,
+            }
+          end)
+          return ''
+        end
+      end
+
+      if accept_cursortab() then
+        reset_cmp_menu_navigation()
         return ''
       end
 
+      -- If the LSP menu popped up on its own, don't let it steal Tab from CursorTab.
+      if cmp.visible() then
+        vim.schedule(function()
+          if cmp.visible() then
+            cmp.abort()
+          end
+        end)
+      end
+
+      -- No CursorTab and no arrow-selected cmp item: behave like a real Tab.
       return '\t'
-    end, { expr = true, silent = true, replace_keycodes = false })
+    end, { expr = true, silent = true, replace_keycodes = false, desc = 'Accept CursorTab or selected cmp item' })
   end,
 }

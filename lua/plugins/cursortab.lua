@@ -10,7 +10,7 @@ return {
         state_dir = vim.fn.stdpath 'state' .. '/cursortab', -- Directory for runtime files (log, socket, pid)
 
         keymaps = {
-          accept = false, -- Keymap to accept completion, or false to disable
+          accept = '<Tab>', -- Keymap to accept completion, or false to disable
           partial_accept = '<S-Tab>', -- Keymap to partially accept, or false to disable
           trigger = false, -- Keymap to manually trigger completion, or false to disable
         },
@@ -71,7 +71,6 @@ return {
           api_key_env = 'MERCURY_AI_TOKEN',
         },
       }
-      vim.keymap.set('n', '<Tab>', require('cursortab').accept)
     end,
   },
 }

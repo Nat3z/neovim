@@ -9,7 +9,7 @@ function create_term(num)
 end
 
 local function git_has_pending_work(cwd)
-  local porcelain = vim.fn.systemlist({ 'git', '-C', cwd, 'status', '--porcelain' })
+  local porcelain = vim.fn.systemlist { 'git', '-C', cwd, 'status', '--porcelain' }
   if vim.v.shell_error ~= 0 then
     return false
   end
@@ -17,37 +17,30 @@ local function git_has_pending_work(cwd)
     return true
   end
 
-  local status = table.concat(vim.fn.systemlist({ 'git', '-C', cwd, 'status' }), '\n'):lower()
-  return status:find('ahead', 1, true) ~= nil
-    or status:find('behind', 1, true) ~= nil
-    or status:find('have diverged', 1, true) ~= nil
+  local status = table.concat(vim.fn.systemlist { 'git', '-C', cwd, 'status' }, '\n'):lower()
+  return status:find('ahead', 1, true) ~= nil or status:find('behind', 1, true) ~= nil or status:find('have diverged', 1, true) ~= nil
 end
 
 local function git_is_up_to_date(cwd)
-  local porcelain = vim.fn.systemlist({ 'git', '-C', cwd, 'status', '--porcelain' })
+  local porcelain = vim.fn.systemlist { 'git', '-C', cwd, 'status', '--porcelain' }
   if vim.v.shell_error ~= 0 or #porcelain > 0 then
     return false
   end
 
-  local status = table.concat(vim.fn.systemlist({ 'git', '-C', cwd, 'status' }), '\n'):lower()
-  local clean = status:find('nothing to commit', 1, true) ~= nil
-    or status:find('working tree clean', 1, true) ~= nil
+  local status = table.concat(vim.fn.systemlist { 'git', '-C', cwd, 'status' }, '\n'):lower()
+  local clean = status:find('nothing to commit', 1, true) ~= nil or status:find('working tree clean', 1, true) ~= nil
   if not clean then
     return false
   end
 
   return status:find('up to date', 1, true) ~= nil
-    or (
-      status:find('ahead', 1, true) == nil
-      and status:find('behind', 1, true) == nil
-      and status:find('have diverged', 1, true) == nil
-    )
+    or (status:find('ahead', 1, true) == nil and status:find('behind', 1, true) == nil and status:find('have diverged', 1, true) == nil)
 end
 
 local function watch_git_up_to_date(pane_id, cwd, saw_work, checks)
   checks = checks or 0
 
-  local panes = vim.fn.systemlist({ 'tmux', 'list-panes', '-F', '#{pane_id}', '-t', pane_id })
+  local panes = vim.fn.systemlist { 'tmux', 'list-panes', '-F', '#{pane_id}', '-t', pane_id }
   if vim.v.shell_error ~= 0 or #panes == 0 then
     return
   end
@@ -58,7 +51,7 @@ local function watch_git_up_to_date(pane_id, cwd, saw_work, checks)
 
   if saw_work and git_is_up_to_date(cwd) then
     vim.notify('Git is up to date; closing tmux pane ' .. pane_id, vim.log.levels.INFO)
-    vim.fn.system({ 'tmux', 'kill-pane', '-t', pane_id })
+    vim.fn.system { 'tmux', 'kill-pane', '-t', pane_id }
     return
   end
 
@@ -74,7 +67,7 @@ end
 
 function open_pi_yeet()
   if vim.env.TMUX == nil or vim.env.TMUX == '' then
-    vim.notify('<leader>gy needs to run inside tmux', vim.log.levels.WARN)
+    vim.notify('yeet needs to run inside tmux', vim.log.levels.WARN)
     return
   end
 
@@ -103,9 +96,9 @@ function open_pi_yeet()
 
   vim.notify('Opened pi in tmux pane ' .. pane_id .. '; sending /yeet', vim.log.levels.INFO)
   vim.defer_fn(function()
-    vim.fn.system({ 'tmux', 'send-keys', '-t', pane_id, '-l', '/yeet' })
+    vim.fn.system { 'tmux', 'send-keys', '-t', pane_id, '-l', '/yeet' }
     vim.defer_fn(function()
-      vim.fn.system({ 'tmux', 'send-keys', '-t', pane_id, 'Enter' })
+      vim.fn.system { 'tmux', 'send-keys', '-t', pane_id, 'Enter' }
       vim.defer_fn(function()
         watch_git_up_to_date(pane_id, cwd)
       end, 600)
@@ -118,6 +111,10 @@ vim.cmd "let &shellcmdflag = '-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -
 vim.cmd "let &shellredir = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode'"
 vim.cmd "let &shellpipe = '2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode'"
 vim.cmd 'set shellquote= shellxquote='
+
+vim.api.nvim_create_user_command('Yeet', function()
+  open_pi_yeet()
+end, { desc = 'Open pi and run /yeet' })
 
 return {
   'akinsho/toggleterm.nvim',
