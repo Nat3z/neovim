@@ -58,10 +58,24 @@ return { -- Autocompletion
       --
       -- No, but seriously. Please read `:help ins-completion`, it is really good!
       mapping = cmp.mapping.preset.insert {
-        -- We handle arrows ourselves below so we can remember when the menu
-        -- was intentionally navigated. That is the only time <Tab> accepts cmp.
-        ['<Down>'] = cmp.config.disable,
-        ['<Up>'] = cmp.config.disable,
+        -- Remember when the menu was intentionally navigated. That is the
+        -- only time <Tab> accepts cmp.
+        ['<Down>'] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp_menu_was_navigated = true
+            cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
+          else
+            fallback()
+          end
+        end, { 'i', 's' }),
+        ['<Up>'] = cmp.mapping(function(fallback)
+          if cmp.visible() then
+            cmp_menu_was_navigated = true
+            cmp.select_prev_item { behavior = cmp.SelectBehavior.Select }
+          else
+            fallback()
+          end
+        end, { 'i', 's' }),
 
         -- Select the [n]ext item
         ['<C-n>'] = cmp.mapping.select_next_item(),
@@ -141,24 +155,6 @@ return { -- Autocompletion
     cmp.event:on('menu_opened', reset_cmp_menu_navigation)
     cmp.event:on('menu_closed', reset_cmp_menu_navigation)
     cmp.event:on('confirm_done', reset_cmp_menu_navigation)
-
-    vim.keymap.set({ 'i', 's' }, '<Down>', function()
-      if cmp.visible() then
-        cmp_menu_was_navigated = true
-        cmp.select_next_item { behavior = cmp.SelectBehavior.Select }
-        return ''
-      end
-      return '<Down>'
-    end, { expr = true, silent = true, replace_keycodes = true, desc = 'Select next cmp item' })
-
-    vim.keymap.set({ 'i', 's' }, '<Up>', function()
-      if cmp.visible() then
-        cmp_menu_was_navigated = true
-        cmp.select_prev_item { behavior = cmp.SelectBehavior.Select }
-        return ''
-      end
-      return '<Up>'
-    end, { expr = true, silent = true, replace_keycodes = true, desc = 'Select previous cmp item' })
 
     vim.api.nvim_create_autocmd('TextChangedI', {
       group = vim.api.nvim_create_augroup('cmp-tab-menu-navigation', { clear = true }),
