@@ -28,10 +28,10 @@ return {
         },
 
         behavior = {
-          idle_completion_delay = 50, -- Delay in ms after idle to trigger completion (-1 to disable)
-          text_change_debounce = 50, -- Debounce in ms after text change to trigger completion (-1 to disable)
+          idle_completion_delay = 750, -- Wait longer before automatic completions to save hosted tokens
+          text_change_debounce = 1000, -- Debounce text changes longer to save hosted tokens
           max_visible_lines = 12, -- Max visible lines per completion (0 to disable)
-          enabled_modes = { 'insert', 'normal' }, -- Modes where completions are active
+          enabled_modes = { 'insert' }, -- Modes where completions are active
           cursor_prediction = {
             enabled = true, -- Show jump indicators after completions
             auto_advance = true, -- When no changes, show cursor jump to last line
@@ -63,13 +63,33 @@ return {
           ghost_text = true, -- Show native ghost text alongside blink menu
         },
 
-        debug = {
-          immediate_shutdown = false, -- Shutdown daemon immediately when no clients
-        },
+        -- Hosted Mercury API option:
         provider = {
           type = 'mercuryapi',
           api_key_env = 'MERCURY_AI_TOKEN',
+          privacy_mode = true,
+          context_size = 512,
+          max_tokens = 16,
+          completion_timeout = 10000,
         },
+
+        -- Local fastest single-line option:
+        -- provider = {
+        --   type = 'inline',
+        --   url = 'http://localhost:8000',
+        --   context_size = 512,
+        --   max_tokens = 8,
+        --   completion_timeout = 3000,
+        -- },
+
+        -- Local multi-line / multi-edit provider:
+        -- provider = {
+        --   type = 'sweep',
+        --   url = 'http://localhost:8000',
+        --   context_size = 768,
+        --   max_tokens = 16,
+        --   completion_timeout = 6000,
+        -- },
       }
     end,
   },

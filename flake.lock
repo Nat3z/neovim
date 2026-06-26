@@ -31,10 +31,24 @@
         "type": "github"
       }
     },
+    "plugins-yeet-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1782396680,
+        "narHash": "sha256-JUuCOCEL4O8obQ3unlt8qEeZhSsSqOxkt5gkctAuTk4=",
+        "path": "/Users/nat/Code/yeet.nvim",
+        "type": "path"
+      },
+      "original": {
+        "path": "/Users/nat/Code/yeet.nvim",
+        "type": "path"
+      }
+    },
     "root": {
       "inputs": {
         "nixCats": "nixCats",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "plugins-yeet-nvim": "plugins-yeet-nvim"
       }
     }
   },

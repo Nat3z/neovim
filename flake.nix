@@ -23,6 +23,10 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
+    plugins-yeet-nvim = {
+      url = "path:/Users/nat/Code/yeet.nvim";
+      flake = false;
+    };
 
     # neovim-nightly-overlay = {
     #   url = "github:nix-community/neovim-nightly-overlay";
@@ -146,6 +150,7 @@
           todo-comments-nvim
           mini-nvim
           nvim-treesitter.withAllGrammars
+          pkgs.neovimPlugins.yeet-nvim
           # This is for if you only want some of the grammars
           # (nvim-treesitter.withPlugins (
           #   plugins: with plugins; [
