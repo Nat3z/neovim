@@ -1,15 +1,11 @@
-return {
-  require 'plugins/teloscope',
-  require 'plugins/catppuccin',
-  require 'plugins/nvim-cmp',
-  require 'plugins/oil',
-  require 'plugins/lazygit',
-  require 'plugins/toggleterm',
-  require 'plugins/copilot',
-  require 'plugins/harpoon',
-  require 'plugins/comment',
-  require 'plugins/tmux-navigator',
-  require 'plugins/99',
-  require 'plugins/cursortab',
-  require 'plugins/yeet',
-}
+local plugins_dir = vim.fs.joinpath(vim.fn.stdpath 'config', 'lua', 'plugins')
+
+local plugins = {}
+for file_name, type in vim.fs.dir(plugins_dir, { follow = true }) do
+  if (type == 'file' or type == 'link') and file_name:match '%.lua$' and file_name ~= 'init.lua' then
+    local module = file_name:gsub('%.lua$', '')
+    table.insert(plugins, require('plugins.' .. module))
+  end
+end
+
+return plugins

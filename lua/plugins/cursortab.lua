@@ -28,7 +28,7 @@ return {
         },
 
         behavior = {
-          idle_completion_delay = 750, -- Wait longer before automatic completions to save hosted tokens
+          idle_completion_delay = 400, -- Wait longer before automatic completions to save hosted tokens
           text_change_debounce = 1000, -- Debounce text changes longer to save hosted tokens
           max_visible_lines = 12, -- Max visible lines per completion (0 to disable)
           enabled_modes = { 'insert' }, -- Modes where completions are active
@@ -68,8 +68,8 @@ return {
           type = 'mercuryapi',
           api_key_env = 'MERCURY_AI_TOKEN',
           privacy_mode = true,
-          context_size = 512,
-          max_tokens = 16,
+          context_size = 2048,
+          max_tokens = 64,
           completion_timeout = 10000,
         },
 

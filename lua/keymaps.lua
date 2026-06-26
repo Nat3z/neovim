@@ -1,5 +1,6 @@
 local plugins_to_reload = {
   'yeet.nvim',
+  'cursortab',
 }
 
 vim.keymap.set('n', '<leader>rr', function()
