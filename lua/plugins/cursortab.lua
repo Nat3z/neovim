@@ -116,8 +116,8 @@ local function get_cursortab_setup(model_using)
       max_tokens = 64,
       completion_timeout = 1000,
     }
-    setup.behavior.idle_completion_delay = 750
-    setup.behavior.text_change_debounce = 800
+    setup.behavior.idle_completion_delay = 400
+    setup.behavior.text_change_debounce = 500
   elseif model_using == 'local' then
     setup.provider = {
       type = 'sweep',
