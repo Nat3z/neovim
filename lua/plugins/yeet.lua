@@ -1,6 +1,5 @@
 return {
   'nat3z/yeet.nvim',
-  dir = require('nixCatsUtils').lazyAdd '~/Code/yeet.nvim',
   name = 'yeet.nvim',
   config = function()
     local yeet = require 'yeet'
