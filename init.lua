@@ -15,6 +15,10 @@ vim.g.maplocalleader = ' '
 -- Load keymaps from user prefs after leader is configured.
 require 'keymaps'
 
+if vim.g.neovide then
+  require 'neovide'
+end
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -111,10 +115,11 @@ vim.diagnostic.config {
   update_in_insert = false,
 }
 
-vim.keymap.set('n', '<C-h>', '<cmd>lua os.execute "tmux select-pane -L"<cr>', { silent = false })
-vim.keymap.set('n', '<C-j>', '<cmd>lua os.execute "tmux select-pane -D"<cr>', { silent = false })
-vim.keymap.set('n', '<C-k>', '<cmd>lua os.execute "tmux select-pane -U"<cr>', { silent = false })
-vim.keymap.set('n', '<C-l>', '<cmd>lua os.execute "tmux select-pane -R"<cr>', { silent = false })
+-- Move between tmux panes, or between windows when not inside tmux (e.g. Neovide)
+for key, direction in pairs { h = 'L', j = 'D', k = 'U', l = 'R' } do
+  local rhs = vim.env.TMUX and ('<cmd>lua os.execute "tmux select-pane -' .. direction .. '"<cr>') or ('<C-w>' .. key)
+  vim.keymap.set('n', '<C-' .. key .. '>', rhs, { silent = false })
+end
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
