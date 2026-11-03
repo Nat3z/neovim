@@ -110,6 +110,7 @@ local function get_cursortab_setup(model_using)
   if model_using == 'hosted' then
     setup.provider = {
       type = 'mercuryapi',
+      model = 'mercury-3', -- overrides cursortab's default of mercury-edit-2
       api_key_env = 'MERCURY_AI_TOKEN',
       privacy_mode = true,
       context_size = 2048,
